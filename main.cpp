@@ -172,7 +172,6 @@ class Board{
         }
 
         void generateZeroed(int x, int y){
-            cout<<suround[x][y]<<endl;
             generateBoard();
             //drawExposed();
             if(suround[x][y] != 0){
@@ -183,6 +182,17 @@ class Board{
             }
             
             return;
+        }
+
+        bool checkwin(){
+            for(int i = 0; i < width; i++){
+                for(int j = 0; j < height; j++){
+                    if(bombs[i][j] != flags[i][j]){
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 };
  
@@ -196,12 +206,12 @@ int main()
     int scalar = 2;
     int height = 32; // can't change this for now I need to figure out how to initialize lists in classes
     int width = 32; //
-    float bomb_prob = 0.1;
+    float bomb_prob = 0.15;
 
     sf::Vector2i mouse_position;
 
 
-    sf::RenderWindow window(sf::VideoMode(scalar * 16 * width, scalar * 16 * height), "minesweeper");
+    sf::RenderWindow window(sf::VideoMode(scalar * 16 * width, scalar * 16 * height), "minesweeper", sf::Style::Close);
     
     
     sf::Image icon;
@@ -218,10 +228,8 @@ int main()
     int x_index;
     int y_index;
     bool unclicked = false;
+    bool haslost;
 
-    
-    sf::RenderWindow *p = &window;
- 
     while (window.isOpen())
     {      
         //if close window button clicked close window
@@ -232,37 +240,45 @@ int main()
                 window.close();
         }
 
+
+
         mouse_position = sf::Mouse::getPosition(window);
 
-        if(event.type == sf::Event::MouseButtonPressed){
-            if(unclicked) 
-            {   
-                unclicked = false;
-                x_index = (mouse_position.x - (mouse_position.x % (16 * scalar))) / (16 * scalar);
-                y_index = (mouse_position.y - (mouse_position.y % (16 * scalar))) / (16 * scalar);
 
-                
-                if(!board.hasBoard){
-                    board.generateZeroed(x_index, y_index);
-                }
-                    
-                if (event.mouseButton.button == sf::Mouse::Left)
+        if(!(board.checkwin() || haslost)){
+            if(event.type == sf::Event::MouseButtonPressed){
+                if(unclicked) 
                 {   
-                    board.uncover(x_index, y_index);
-                }
-                else{
-                    board.flag(x_index, y_index);
+                    unclicked = false;
+                    x_index = (mouse_position.x - (mouse_position.x % (16 * scalar))) / (16 * scalar);
+                    y_index = (mouse_position.y - (mouse_position.y % (16 * scalar))) / (16 * scalar);
+
+                    
+                    if(!board.hasBoard){
+                        board.generateZeroed(x_index, y_index);
+                    }
+                        
+                    if (event.mouseButton.button == sf::Mouse::Left)
+                    {   
+                        if(board.uncover(x_index, y_index) == 1){
+                            haslost = true;
+                        }
+                    }
+                    else{
+                        board.flag(x_index, y_index);
+                    }
                 }
             }
-        }
-        else if(!unclicked)
-        {   
-            unclicked = true;
+            else if(!unclicked)
+            {   
+                unclicked = true;
+            }
         }
 
 
         window.clear(sf::Color::White);
         
+
         board.draw();
 
         
