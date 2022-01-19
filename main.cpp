@@ -33,6 +33,7 @@ class Board{
 
     public:
         bool hasBoard = false;
+        // constructor
         Board(int s, int w, int h, float p, sf::RenderWindow &win) : window(win){
             scalar = s;
             height = h;
@@ -50,6 +51,7 @@ class Board{
             }
         }
         
+        //create a game board
         void generateBoard() {
 
             for(int i = 0; i < width; i++){
@@ -89,7 +91,8 @@ class Board{
                 }
             }
         }
-
+        
+        // draw all tiles on board
         void draw() {
             for(int i = 0; i < width; i++){
                 for(int j = 0; j < height; j++){
@@ -98,6 +101,7 @@ class Board{
             }
         }
 
+        // draw board completely uncovered
         void drawExposed() {
             
             for(int i = 0; i < width; i++){
@@ -108,7 +112,7 @@ class Board{
             }
         }
         
-
+        // uncover tile
         int uncover(int x, int y){
             if(uncovered[x][y]){
                 return -1; 
@@ -138,7 +142,8 @@ class Board{
             }
             return -1;
         }
-
+        
+        // place flag on square clicked
         int flag(int x, int y){
             if(!uncovered[x][y]){
                 flags[x][y] = !flags[x][y];
@@ -153,6 +158,7 @@ class Board{
             return -1;
         }
 
+        // generate a board where the clicked square has no bombs around it
         void generateZeroed(int x, int y){
             generateBoard();
             //drawExposed();
@@ -166,6 +172,7 @@ class Board{
             return;
         }
 
+        // check if the board is in a winning state
         bool checkwin(){
             for(int i = 0; i < width; i++){
                 for(int j = 0; j < height; j++){
@@ -181,7 +188,7 @@ class Board{
 
 int main()
 { 
-
+    // create variables for window creation
     srand(time(0));
     int scalar = 2;
     int height = 32; // can't change this for now I need to figure out how to initialize lists in classes
@@ -190,16 +197,18 @@ int main()
 
     sf::Vector2i mouse_position;
 
-
+    // create window
     sf::RenderWindow window(sf::VideoMode(scalar * 16 * width, scalar * 16 * height), "minesweeper", sf::Style::Close);
     
-    
+    // create darken effect for endgame
     sf::Texture blur;
     blur.loadFromFile("sprites/translucent.png", sf::IntRect(0, 0, 16, 16));
     sf::Sprite fullscreen;
     fullscreen.setTexture(blur);
     fullscreen.setScale(scalar * 16 * width, scalar * 16 * height);
 
+
+    //create endscreen loss message
     sf::Texture won;
     sf::Texture lost;
 
@@ -210,12 +219,14 @@ int main()
     endscreen.setScale(scalar * 3, scalar * 3);
     endscreen.setOrigin((-8 * width) / 3 + 16, (-8 * height) / 3 + 32);
     
-
+    // create restart button
     Button reset(window);
 
     reset.setScale(scalar * 2, scalar * 2);
     reset.setOrigin(-4 * width + 32, -4 * height);
 
+
+    // set textures for reset button
     sf::Texture resetBase;
     sf::Texture resetHover;
     sf::Texture resetClicked;
@@ -230,17 +241,16 @@ int main()
 
     
 
-    
+    // set icon for application
     sf::Image icon;
     icon.loadFromFile("sprites/bomb.png"); 
     
 
-
+    // create board
     Board board = Board(scalar, width, height, bomb_prob, window);
     board.generateBoard();
     
-
-
+    // initialize variables for use in windows
     int x_index;
     int y_index;
     bool unclicked = false;
@@ -249,7 +259,6 @@ int main()
 
     while (window.isOpen())
     {      
-        
         //if close window button clicked close window
         sf::Event event;
         while (window.pollEvent(event))
@@ -258,17 +267,18 @@ int main()
                 window.close();
         }
 
-
-
         mouse_position = sf::Mouse::getPosition(window);
 
         haswon = board.checkwin();
         
         if(!(haswon || haslost)){
+            // if click event get board index
             if(event.type == sf::Event::MouseButtonPressed){
+                // only continue if the mouse is on the 'rising edge' of being clicked
                 if(unclicked) 
                 {   
                     unclicked = false;
+                    // get tile of the board the mouse is above
                     x_index = (mouse_position.x - (mouse_position.x % (16 * scalar))) / (16 * scalar);
                     y_index = (mouse_position.y - (mouse_position.y % (16 * scalar))) / (16 * scalar);
 
@@ -276,13 +286,15 @@ int main()
                     if(!board.hasBoard){
                         board.generateZeroed(x_index, y_index);
                     }
-                        
+                    
+                    //uncover board tile
                     if (event.mouseButton.button == sf::Mouse::Left)
                     {   
                         if(board.uncover(x_index, y_index) == 1){
                             haslost = true;
                         }
                     }
+                    // flag board tile
                     else{
                         board.flag(x_index, y_index);
                     }
@@ -297,13 +309,13 @@ int main()
 
         
 
-
-       window.clear(sf::Color::White);
+        // clear window 
+        window.clear(sf::Color::White);
         
-
+        // draw tiles
         board.draw();
         
-
+        // if the game has been won or lost show end screen
         if(haswon || haslost) {
             if(haslost){
                 endscreen.setTexture(lost);
@@ -315,6 +327,8 @@ int main()
             reset.updatetexture(); 
             window.draw(reset);
             window.draw(endscreen);
+
+            // reset the board
             if(reset.clicked){
                 haslost = false;
                 haslost = false;

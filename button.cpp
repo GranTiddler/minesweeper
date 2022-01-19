@@ -1,15 +1,18 @@
 #include <SFML/Graphics.hpp>
 #include "button.hpp"
 
+//constructor
 Button::Button(sf::RenderWindow &win) : window(win)
 {
 }
 
+//get bounding box around button
 void Button::updateBounds()
 {
     bounds = getGlobalBounds();
 }
 
+//get if the mouse is above the button
 bool Button::gethovered()
 {
     mouse_position = sf::Mouse::getPosition(window);
@@ -23,6 +26,7 @@ bool Button::gethovered()
     return false;
 }
 
+//get if the button is currently pressed down
 bool Button::getclicked()
 {
     if (gethovered())
@@ -37,6 +41,7 @@ bool Button::getclicked()
     return false;
 }
 
+// change to texture based on state of button
 void Button::updatetexture()
 {
     getclicked();
@@ -54,6 +59,7 @@ void Button::updatetexture()
     }
 }
 
+//set texture for button states
 void Button::setBaseTexture(sf::Texture texture)
 {
     baseTexture = texture;
