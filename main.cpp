@@ -3,23 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <cstdlib>
 #include <ctime>
-
-/*
-To run file:
--------------
-
-*/
-
-/*
-TODO
------------
-        -get number of flags left
-        -get if won
-        -loop until win or loss condition met
-        
-
-
-*/
+#include "button.hpp"
 
 using namespace std;
 
@@ -196,9 +180,7 @@ class Board{
  
 
 int main()
-{  
-    sf::Texture base;
-    base.loadFromFile("sprites/base.png", sf::IntRect(0, 0, 16, 16));
+{ 
 
     srand(time(0));
     int scalar = 2;
@@ -212,6 +194,43 @@ int main()
     sf::RenderWindow window(sf::VideoMode(scalar * 16 * width, scalar * 16 * height), "minesweeper", sf::Style::Close);
     
     
+    sf::Texture blur;
+    blur.loadFromFile("sprites/translucent.png", sf::IntRect(0, 0, 16, 16));
+    sf::Sprite fullscreen;
+    fullscreen.setTexture(blur);
+    fullscreen.setScale(scalar * 16 * width, scalar * 16 * height);
+
+    sf::Texture won;
+    sf::Texture lost;
+
+    lost.loadFromFile("sprites/lose.png");
+    won.loadFromFile("sprites/won.png");
+
+    sf::Sprite endscreen;
+    endscreen.setScale(scalar * 3, scalar * 3);
+    endscreen.setOrigin((-8 * width) / 3 + 16, (-8 * height) / 3 + 32);
+    
+
+    Button reset(window);
+
+    reset.setScale(scalar * 2, scalar * 2);
+    reset.setOrigin(-4 * width + 32, -4 * height);
+
+    sf::Texture resetBase;
+    sf::Texture resetHover;
+    sf::Texture resetClicked;
+
+    resetBase.loadFromFile("sprites/restartBase.png");
+    resetHover.loadFromFile("sprites/restartHover.png");
+    resetClicked.loadFromFile("sprites/restartClicked.png");
+
+    reset.setBaseTexture(resetBase);
+    reset.setHoverTexture(resetHover);
+    reset.setClickedTexture(resetClicked);
+
+    
+
+    
     sf::Image icon;
     icon.loadFromFile("sprites/bomb.png"); 
     
@@ -222,14 +241,15 @@ int main()
     
 
 
-
     int x_index;
     int y_index;
     bool unclicked = false;
-    bool haslost;
+    bool haslost = false;
+    bool haswon = false;
 
     while (window.isOpen())
     {      
+        
         //if close window button clicked close window
         sf::Event event;
         while (window.pollEvent(event))
@@ -242,8 +262,9 @@ int main()
 
         mouse_position = sf::Mouse::getPosition(window);
 
-
-        if(!(board.checkwin() || haslost)){
+        haswon = board.checkwin();
+        
+        if(!(haswon || haslost)){
             if(event.type == sf::Event::MouseButtonPressed){
                 if(unclicked) 
                 {   
@@ -272,12 +293,35 @@ int main()
                 unclicked = true;
             }
         }
+        
+
+        
 
 
-        window.clear(sf::Color::White);
+       window.clear(sf::Color::White);
         
 
         board.draw();
+        
+
+        if(haswon || haslost) {
+            if(haslost){
+                endscreen.setTexture(lost);
+            }
+            else{
+                endscreen.setTexture(won);
+            }
+            window.draw(fullscreen);
+            reset.updatetexture(); 
+            window.draw(reset);
+            window.draw(endscreen);
+            if(reset.clicked){
+                haslost = false;
+                haslost = false;
+                board.generateBoard();
+                board.hasBoard = false;
+            }
+        }
 
         
 
