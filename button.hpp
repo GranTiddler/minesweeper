@@ -26,6 +26,10 @@ class Button : public sf::Sprite{
 
         bool getclicked();
 
+        bool getrising();
+        
+        bool getfalling();
+
         void updatetexture();
 
         void setBaseTexture(sf::Texture texture);
@@ -33,4 +37,5 @@ class Button : public sf::Sprite{
         void setHoverTexture(sf::Texture texture);
         
         void setClickedTexture(sf::Texture texture);
+
 };

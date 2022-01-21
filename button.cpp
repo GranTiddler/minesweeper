@@ -41,6 +41,33 @@ bool Button::getclicked()
     return false;
 }
 
+bool Button::getfalling()
+{
+    if (clicked)
+    {
+        if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        {
+            return true;
+        }
+    }
+    clicked = false;
+    return false;
+}
+
+bool Button::getrising()
+{
+    if (!clicked)
+    {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        {
+            return true;
+        }
+    }
+    clicked = false;
+    return false;
+}
+
+
 // change to texture based on state of button
 void Button::updatetexture()
 {

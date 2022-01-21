@@ -323,18 +323,21 @@ int main()
             else{
                 endscreen.setTexture(won);
             }
+
+            if(reset.getfalling()){
+                haslost = false;
+                haslost = false;
+                board.generateBoard();
+                board.hasBoard = false;
+            }
+            
             window.draw(fullscreen);
             reset.updatetexture(); 
             window.draw(reset);
             window.draw(endscreen);
 
             // reset the board
-            if(reset.clicked){
-                haslost = false;
-                haslost = false;
-                board.generateBoard();
-                board.hasBoard = false;
-            }
+            
         }
 
         
